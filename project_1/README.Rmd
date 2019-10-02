@@ -9,7 +9,9 @@ The quistions to be answered:
 1. The total number of families supported?
 2. The number of families supported by year?
 3. The food pounds provided by year?
-4. Longest and shortest time support for families?
-5. Average family size (by column food provided for)? 
+4. The number of diapers provided by year?
+5. The number of clothing items provided by year?
+6. The number of school kits and hygien kits provided by year?
+7. Average family size (by column food provided for)? 
 
 
