@@ -11,7 +11,7 @@ library(tidyverse)
 library(ggplot2)
 ```
 
-Data was provided by **Urban Ministries of Durham**.
+Data was provided by [**Urban Ministries of Durham**](http://www.umdurham.org/).
 
 Urban Ministries of Durham (UMD) operates the Food Pantry and Clothing Closet and Community Cafe to address basic emergency needs for food, clothing, diapers and hygiene supplies.
 
@@ -27,15 +27,17 @@ The quistions to be answered:
 
 
 # Data cleaning
-I will use only non-character columns for analysis.
+I will use only non-character variables for analysis.
+
 ```{r message=FALSE, warning=FALSE}
 
 UMD_data <- read_tsv("https://raw.githubusercontent.com/biodatascience/datasci611/gh-pages/data/project1_2019/UMD_Services_Provided_20190719.tsv") %>%
   mutate(N_Date = as.Date(Date, "%m/%d/%Y")) %>%
-  select_if(~!is.character(.)) %>%
-  select_if(~!is.logical(.)) %>%
-  arrange(N_Date)
+  select_if(~!is.character(.)) %>% # removing all character variables
+  select_if(~!is.logical(.)) %>% # removing all logical variables
+  arrange(N_Date) 
 
+# Visualize the date when services were provided
 ggplot(data = UMD_data, aes(x=N_Date)) +
   geom_histogram(alpha = 0.4) +
   theme_classic() +
@@ -50,15 +52,21 @@ UMD was estabblished in 1983, so it is possible that data provided before this d
 We can also see that almost *no information* provided for the dates before year 2000.
 
 # Filter the data
+
+For the next analysis I will filter the data range between 01/01/2019 and 06/30/2019.
+
 ```{r message=FALSE, warning=FALSE}
 
 UMD_cld <- UMD_data %>%
   filter(between(N_Date, as.Date("2000-01-01"), as.Date("2019-06-30"))) %>%
-  mutate(Year = as.numeric(format(N_Date, "%Y"))) 
+  mutate(Year = as.numeric(format(N_Date, "%Y"))) # created Year variable
 
 ```
 
 # Total clients supported by year
+
+In this section I wil determine the number of clients supported by year to find is there any trends which we can use for future?
+
 ```{r message=FALSE, warning=FALSE}
 
 clients = UMD_cld %>%
@@ -77,7 +85,13 @@ ggplot(clients, aes(Year, N_Client)) +
 
 ```
 
+We can clearly see that number of clients per year were increasing from 2000 to 2014 and quite satble in the last five years.
+
 # Food pounds provided per year
+
+As we know that food help is one of the most important services provided by UMD. I will determine the trend of pounds of food provided to customers each year for the next firve years. I think this might be helpfull for UMD to determine requid space for storage and funding. 
+
+
 ```{r message=FALSE, warning=FALSE}
 
 food_df <- UMD_cld %>%
@@ -95,35 +109,61 @@ ggplot(food_df,aes(x = Year, y = food)) +
 ```
 
 # How much food (in pounds) will be provided for next 5 years?
+
 ```{r message=FALSE, warning=FALSE}
-food_model=lm(food ~ Year, food_df)
-pred_years <- c(2019, 2020, 2021, 2022, 2023)
+food_model=lm(food ~ Year, food_df) # applied linear model
 
-food_pred <- data.frame(Year=pred_years)
-prd=predict(food_model, food_pred)
+pred_years <- data.frame(Year=c(2019, 2020, 2021, 2022, 2023))
 
-names(prd)[] <- c('2019','2020', '2021', '2022', '2023')
+prd <- data.frame(predict(food_model, pred_years))
 
-prd
+pred_df <- cbind(pred_years, prd)  %>%
+  mutate(prd_f=as.factor(2))
 
+names(pred_df)[2] <- 'food'
+
+# Plot the data together with predicted values
+
+new_food_df <- food_df %>%
+  select(-count) %>%
+  mutate(prd_f=as.factor(1)) %>%
+  rbind(pred_df)
+
+ggplot(new_food_df,aes(x = Year, y = food)) +
+  geom_col(alpha = 0.4, aes(fill=prd_f)) +
+  geom_smooth(color='red', se=FALSE) +
+  theme_classic() +
+  labs(title = 'Food (pounds) per Year',
+       y = 'Food Pounds')+
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Provided data", "Predicted data"))
+
+  
 ```
 
+This data shows that the pounds of of which will be provided for next five years may still grow. This data may help UMD to prepara enogh food for their clients.
+
 # Distribution of diapers by year
+
+In this section we will plot the data about diapers help by year for all clients.
+
 ```{r message=FALSE, warning=FALSE}
 UMD_cld %>%
   drop_na('Diapers') %>%
   group_by(Year) %>%
   summarise(count = n(),diapers=sum(Diapers)) %>%
   ggplot(aes(x = Year, y = diapers)) +
-  geom_point(size = 2, alpha = 0.4) +
-  geom_smooth(color='red', se=FALSE) +
+  geom_col(alpha = 0.4) +
   theme_classic() +
   labs(title = 'Diapers help by Year',
        y = 'Number of diapers')
 ```
 
+The data shows there was a decrease in this type of help starting from 2010, except year 2018.
 
 # Distribution of clothing items by year
+
+In this section we will plot the data about closing items help by year for all clients.
 
 ```{r message=FALSE, warning=FALSE}
 UMD_cld %>%
@@ -131,7 +171,7 @@ UMD_cld %>%
   group_by(Year) %>%
   summarise(count = n(),cloth=sum(`Clothing Items`)) %>%
   ggplot(aes(x = Year, y = cloth)) +
-  geom_point(size = 1.5, alpha = 0.4) +
+  geom_col(alpha = 0.4) +
   geom_smooth(color='red', se=FALSE) +
   theme_classic() +
   labs(title = 'Clothing Items distribution by Year',
@@ -139,8 +179,12 @@ UMD_cld %>%
 
 ```
 
+We can clearly see that closing items stil remain very important help for UMD customers.
 
 # Distribution of School kits by year
+
+In this section we will plot the data about distribution of schools supplies help by year for all clients.
+
 ```{r message=FALSE, warning=FALSE}
 UMD_cld %>%
   drop_na(`School Kits`) %>%
@@ -154,6 +198,7 @@ UMD_cld %>%
 
 ```
 
+There is no clear trend on school kits help for the last years.
 
 # Distribution of Hygiene kits by year
 
@@ -164,14 +209,19 @@ UMD_cld %>%
   summarise(count = n(), kit = sum(`Hygiene Kits`)) %>%
   ggplot(aes(x = Year, y = kit)) +
   geom_col(alpha = 0.4) +
+  geom_smooth(color='red', se=FALSE) +
   theme_classic() +
   labs(title = 'Hygiene Kits distribution by Year',
        y = 'Number of Hygiene Kits')
 
 ```
 
+The hygiene kits heps seems to be decrising over the last 5 years.
+
 
 # Average family size (by column food provided for)
+
+I will calculate the average family size to help the UMD predict the amount of food needs for each family.
 
 ```{r message=FALSE, warning=FALSE}
 family_size <- UMD_cld %>%
@@ -183,4 +233,10 @@ family_size <- UMD_cld %>%
 mean(family_size$food)
 
 ```
+
+The average family sisze is 2.8 people.
+
+# Conclusion
+
+In this project I tried to present the data provided by Urban Ministry of Durham. Data visualisation can help the UMD to see better see previos data summary to serve homeless people more efficient.
 
