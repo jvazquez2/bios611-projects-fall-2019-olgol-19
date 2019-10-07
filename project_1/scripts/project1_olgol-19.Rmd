@@ -15,14 +15,14 @@ Data was provided by [**Urban Ministries of Durham**](http://www.umdurham.org/).
 
 Urban Ministries of Durham (UMD) operates the Food Pantry and Clothing Closet and Community Cafe to address basic emergency needs for food, clothing, diapers and hygiene supplies.
 
-The quistions to be answered:
+The questions to be answered:
 
 1. The total number of families supported?
 2. The number of families supported by year?
 3. The food pounds provided by year?
 4. The number of diapers provided by year?
 5. The number of clothing items provided by year?
-6. The number of school kits and hygien kits provided by year?
+6. The number of school kits and hygiene kits provided by year?
 7. Average family size (by column food provided for)? 
 
 
@@ -234,7 +234,7 @@ mean(family_size$food)
 
 ```
 
-The average family sisze is 2.8 people.
+The average family size is 2.8 people.
 
 # Conclusion
 
