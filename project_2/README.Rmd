@@ -1,0 +1,21 @@
+---
+title: "Project 2: Shiny application for Urban Ministry of Durham"
+author: "olgol-19"
+date: "October 14, 2019"
+output: html_document
+---
+# Data Source
+
+Data was provided by Urban Ministries of Durham.
+
+Urban Ministries of Durham operates the Food Pantry and Clothing Closet and Community Cafe to address basic emergency needs for food, clothing, diapers and hygiene supplies.
+
+# Problem
+
+The data from the Project 1 is usufull but somewhat difficult to understand to anyone who have never used the scientific reports before.
+I need to present the data to the customer in more clear and interactive way to give the opportunity to explore the data.
+
+# What need to be done?
+
+1. Allow user to select the data range for report.
+2. Give the options to choose between different result plots.
